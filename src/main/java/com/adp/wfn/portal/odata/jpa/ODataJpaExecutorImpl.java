@@ -2,7 +2,6 @@ package com.adp.wfn.portal.odata.jpa;
 
 import com.adp.wfn.portal.odata.filter.ODataFilter;
 import org.apache.commons.collections4.CollectionUtils;
-import org.hibernate.hql.internal.ast.QuerySyntaxException;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -45,7 +44,7 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
 
     @Override
     public List<T> findAll(@Nullable Specification<T> specification, ODataFilter filter){
-        if(CollectionUtils.isNotEmpty(Arrays.asList(filter.getSelectors()))){
+        if(filter.hasSelectors() && CollectionUtils.isNotEmpty(Arrays.asList(filter.getSelectors()))){
             return getQuery(specification, Sort.unsorted(), filter).getResultList().stream()
                     .map(tuple -> {
                         try {
@@ -106,11 +105,7 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
             query.orderBy(QueryUtils.toOrders(sort, root, builder));
         }
 
-        try{
-            return this.entityManager.createQuery(query);
-        } catch (QuerySyntaxException e){
-            throw new QuerySyntaxException(String.format("Unable to locate appropriate constructor on class [%s]", getDomainClass()));
-        }
+        return this.entityManager.createQuery(query);
     }
 
     private List<Selection<?>> getSelection(String[] selectors, Root<T> root) {
@@ -160,7 +155,7 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
 
     }
 
-    private T createObjectFromTuple(ODataFilter filter, Tuple tuple) throws InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
+    private T createObjectFromTuple(ODataFilter filter, Tuple tuple) throws Exception {
         T instance = getDomainClass().getDeclaredConstructor().newInstance();
 
         for (int i = 0; i < filter.getSelectors().length; i++) {
