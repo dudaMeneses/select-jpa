@@ -1,6 +1,6 @@
-package com.adp.wfn.portal.odata.jpa;
+package com.dudaMeneses.odata.jpa;
 
-import com.adp.wfn.portal.odata.filter.ODataFilter;
+import com.dudaMeneses.odata.filter.ODataFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

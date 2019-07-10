@@ -1,4 +1,4 @@
-package com.adp.wfn.portal.odata.filter;
+package com.dudaMeneses.odata.filter;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

@@ -1,6 +1,6 @@
-package com.adp.wfn.portal.odata.jpa;
+package com.dudaMeneses.odata.jpa;
 
-import com.adp.wfn.portal.odata.filter.ODataFilter;
+import com.dudaMeneses.odata.filter.ODataFilter;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.spring.api.DBRider;
 import config.TestApplication;
