@@ -4,7 +4,7 @@ This library integrate OData way of REST exposing with Spring and JPA.
 ## Dependency
 ```xml
 <dependency>
-    <groupId>com.adp.wfn.portal</groupId>
+    <groupId>com.dudaMeneses</groupId>
     <artifactId>odata-jpa</artifactId>
     <version>${project.version}</version>
     <scope>compile</scope>
