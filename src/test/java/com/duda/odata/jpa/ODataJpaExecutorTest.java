@@ -1,6 +1,6 @@
-package com.dudaMeneses.odata.jpa;
+package com.duda.odata.jpa;
 
-import com.dudaMeneses.odata.filter.ODataFilter;
+import com.duda.odata.filter.ODataFilter;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.spring.api.DBRider;
 import config.TestApplication;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ import static org.junit.Assert.assertThat;
 @Transactional
 @RunWith(SpringRunner.class)
 @DataSet(value = "datasets/test.yml")
-@SpringBootTest(classes = TestApplication.class)
+@ContextConfiguration(classes = TestApplication.class)
 @TestPropertySource(locations = {"classpath:test.properties"})
 public class ODataJpaExecutorTest {
 

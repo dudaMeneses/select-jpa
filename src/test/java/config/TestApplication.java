@@ -1,6 +1,6 @@
 package config;
 
-import com.dudaMeneses.odata.jpa.ODataJpaExecutorImpl;
+import com.duda.odata.jpa.ODataJpaExecutorImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;

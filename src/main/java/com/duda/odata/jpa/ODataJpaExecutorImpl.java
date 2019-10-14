@@ -1,6 +1,6 @@
-package com.dudaMeneses.odata.jpa;
+package com.duda.odata.jpa;
 
-import com.dudaMeneses.odata.filter.ODataFilter;
+import com.duda.odata.filter.ODataFilter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.data.domain.Page;
@@ -40,6 +40,12 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
         super(entityInformation, entityManager);
         this.entityManager = entityManager;
         this.entityInformation = entityInformation;
+    }
+
+    //TODO: implement full filter usage
+    @Override
+    public List<T> findAll(ODataFilter filter) {
+        return null;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.dudaMeneses.odata.filter;
+package com.duda.odata.filter;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -14,6 +14,7 @@ import java.awt.print.Pageable;
 @EqualsAndHashCode
 public class ODataFilter {
     String[] selectors;
+    Integer count;
     Pageable pageable;
     Sort sort;
 

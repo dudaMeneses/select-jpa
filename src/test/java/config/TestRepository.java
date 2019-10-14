@@ -1,6 +1,6 @@
 package config;
 
-import com.dudaMeneses.odata.jpa.ODataJpaExecutor;
+import com.duda.odata.jpa.ODataJpaExecutor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
