@@ -6,12 +6,12 @@ import com.github.database.rider.spring.api.DBRider;
 import config.TestApplication;
 import config.TestRepository;
 import config.TestSpecification;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
@@ -44,7 +44,7 @@ public class ODataJpaExecutorTest {
 
     @Test
     public void findAll_whenHaveSelector_shouldReturnAllSelectedFields(){
-        assertThat(testRepository.findAll(TestSpecification.getAll(), ODataFilter.builder().selectors(new String[]{"id"}).build()), hasItem(allOf(
+        assertThat(testRepository.findAll(TestSpecification.getAll(), ODataFilter.builder().selectors(Lists.newArrayList("id")).build()), hasItem(allOf(
                 hasProperty("id", is(not(nullValue()))),
                 hasProperty("name", is(nullValue()))
         )));
@@ -62,7 +62,7 @@ public class ODataJpaExecutorTest {
 
     @Test
     public void findAll_whenGettingPageWithSelector_shouldReturnAllSelectedFields(){
-        assertThat(testRepository.findAll(TestSpecification.getAll(), PageRequest.of(1, 1), ODataFilter.builder().selectors(new String[]{"id"}).build()),
+        assertThat(testRepository.findAll(TestSpecification.getAll(), PageRequest.of(1, 1), ODataFilter.builder().selectors(Lists.newArrayList("id")).build()),
                 hasProperty("content", hasItem(allOf(
                     hasProperty("id", is(not(nullValue()))),
                     hasProperty("name", is(nullValue()))
@@ -82,7 +82,7 @@ public class ODataJpaExecutorTest {
 
     @Test
     public void findAll_whenUnpagedPageWithSelector_shouldReturnAllSelectedFields(){
-        assertThat(testRepository.findAll(TestSpecification.getAll(), Pageable.unpaged(), ODataFilter.builder().selectors(new String[]{"id"}).build()),
+        assertThat(testRepository.findAll(TestSpecification.getAll(), Pageable.unpaged(), ODataFilter.builder().selectors(Lists.newArrayList("id")).build()),
                 hasProperty("content", hasItem(allOf(
                         hasProperty("id", is(not(nullValue()))),
                         hasProperty("name", is(nullValue()))
@@ -92,7 +92,7 @@ public class ODataJpaExecutorTest {
 
     @Test(expected = InvalidPropertyException.class)
     public void findAll_whenEntityHasNoProperEntity_shouldThrowException(){
-        testRepository.findAll(TestSpecification.getAll(), ODataFilter.builder().selectors(new String[]{"email"}).build());
+        testRepository.findAll(TestSpecification.getAll(), ODataFilter.builder().selectors(Lists.newArrayList("email")).build());
     }
 
 }

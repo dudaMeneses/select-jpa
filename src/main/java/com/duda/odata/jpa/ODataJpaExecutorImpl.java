@@ -18,39 +18,35 @@ import org.springframework.util.Assert;
 import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
+import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements ODataJpaExecutor<T> {
 
-    private final JpaEntityInformation entityInformation;
     private final EntityManager entityManager;
 
     public ODataJpaExecutorImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.entityManager = entityManager;
-        this.entityInformation = entityInformation;
     }
 
-    //TODO: implement full filter usage
     @Override
     public List<T> findAll(ODataFilter filter) {
-        return null;
+        return findAll(getFilterSpecification(filter), filter);
+    }
+
+
+    @Override
+    public long count(ODataFilter filter) {
+        return count(getFilterSpecification(filter));
     }
 
     @Override
-    public List<T> findAll(@Nullable Specification<T> specification, ODataFilter filter){
-        if(filter.hasSelectors() && CollectionUtils.isNotEmpty(Arrays.asList(filter.getSelectors()))){
+    public List<T> findAll(Specification<T> specification, ODataFilter filter){
+        if(filter.hasSelectors() && CollectionUtils.isNotEmpty(filter.getSelectors())){
             return getQuery(specification, Sort.unsorted(), filter).getResultList().stream()
                     .map(tuple -> {
                         try {
@@ -67,7 +63,7 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
 
     @Override
     public Page<T> findAll(@Nullable Specification<T> specification, Pageable pageable, ODataFilter filter){
-        if(filter.getSelectors() != null && CollectionUtils.isNotEmpty(Arrays.asList(filter.getSelectors()))){
+        if(CollectionUtils.isNotEmpty(filter.getSelectors())){
             TypedQuery<Tuple> query = getQuery(specification, pageable, filter);
             return (Page)(pageable.isUnpaged() ?
                     new PageImpl(query.getResultList().stream()
@@ -80,10 +76,14 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
                             })
                             .collect(Collectors.toList())
                     ) :
-                    this.readPageFromTuple(query, this.getDomainClass(), pageable, specification, filter));
+                    this.readPageFromTuple(query, this.getDomainClass(), pageable, specification, filter)
+            );
         } else {
             TypedQuery<T> query = getQuery(specification, pageable);
-            return (Page)(pageable.isUnpaged() ? new PageImpl(query.getResultList()) : this.readPage(query, this.getDomainClass(), pageable, specification));
+            return (Page)(pageable.isUnpaged() ?
+                    new PageImpl(query.getResultList()) :
+                    this.readPage(query, this.getDomainClass(), pageable, specification)
+            );
         }
     }
 
@@ -114,7 +114,7 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
         return this.entityManager.createQuery(query);
     }
 
-    private List<Selection<?>> getSelection(String[] selectors, Root<T> root) {
+    private List<Selection<?>> getSelection(List<String> selectors, Root<T> root) {
         List<Selection<?>> selections = new ArrayList<>();
 
         if(selectors != null){
@@ -157,15 +157,15 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
                         })
                 .collect(Collectors.toList()),
                 pageable,
-                () -> executeCountQuery(this.getCountQuery(specification, domainClass)));
-
+                () -> executeCountQuery(this.getCountQuery(specification, domainClass))
+        );
     }
 
     private T createObjectFromTuple(ODataFilter filter, Tuple tuple) throws Exception {
         T instance = getDomainClass().getDeclaredConstructor().newInstance();
 
-        for (int i = 0; i < filter.getSelectors().length; i++) {
-            Field field = getDomainClass().getDeclaredField(filter.getSelectors()[i]);
+        for (int i = 0; i < filter.getSelectors().size(); i++) {
+            Field field = getDomainClass().getDeclaredField(filter.getSelectors().get(i));
             field.setAccessible(true);
             field.set(instance, tuple.get(i));
         }
@@ -176,13 +176,20 @@ public class ODataJpaExecutorImpl<T, ID extends Serializable> extends SimpleJpaR
     private static Long executeCountQuery(TypedQuery<Long> query) {
         Assert.notNull(query, "TypedQuery must not be null!");
         List<Long> totals = query.getResultList();
-        Long total = 0L;
+        long total = 0L;
 
         Long element;
-        for(Iterator var3 = totals.iterator(); var3.hasNext(); total = total + (element == null ? 0L : element)) {
-            element = (Long)var3.next();
+        for(Iterator var3 = totals.iterator(); var3.hasNext(); total += (element == null ? 0L : element)) {
+            element = (Long) var3.next();
         }
 
         return total;
+    }
+
+    private Specification<T> getFilterSpecification(ODataFilter filter) {
+        return (Specification<T>) (root, criteriaQuery, criteriaBuilder) ->
+                criteriaBuilder.and(
+                        filter.getFilters().toArray(new Predicate[filter.getFilters().size()])
+                );
     }
 }

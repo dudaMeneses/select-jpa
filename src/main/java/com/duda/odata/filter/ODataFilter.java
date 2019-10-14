@@ -3,22 +3,23 @@ package com.duda.odata.filter;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Sort;
 
 import java.awt.print.Pageable;
+import java.util.List;
 
 @Getter
-@Setter
 @Builder
 @EqualsAndHashCode
 public class ODataFilter {
-    String[] selectors;
+    List<String> selectors;
     Integer count;
     Pageable pageable;
     Sort sort;
+    List<ODataOperator> filters;
 
     public boolean hasSelectors(){
-        return selectors != null && selectors.length > 0;
+        return CollectionUtils.isNotEmpty(selectors);
     }
 }

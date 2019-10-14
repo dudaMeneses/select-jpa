@@ -14,5 +14,5 @@ public interface ODataJpaExecutor<T> {
     List<T> findAll(ODataFilter filter);
     List<T> findAll(@Nullable Specification<T> specification, ODataFilter filter);
     Page<T> findAll(@Nullable Specification<T> specification, Pageable pageable, ODataFilter filter);
-    long count(@Nullable Specification<T> specification);
+    long count(ODataFilter filter);
 }

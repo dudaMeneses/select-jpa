@@ -1,6 +1,5 @@
 package com.duda.odata;
 
-import com.duda.odata.filter.ODataFilter;
 import com.duda.odata.interpreter.ODataInterpreter;
 import com.duda.odata.jpa.ODataJpaExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,16 @@ public class ODataController<T> {
     private ODataJpaExecutor<T> executor;
 
     @GetMapping
-    public List findAll(@RequestParam("query") String query){
-        return executor.findAll(ODataInterpreter.getFilter(query));
+    public List findAll(@RequestParam("select") List<String> selectors,
+                        @RequestParam("top") Integer top,
+                        @RequestParam("filter") String filter){
+        return executor.findAll(ODataInterpreter.getFilter(selectors, top, filter));
+    }
+
+    @GetMapping(path = "/count")
+    public Long count(@RequestParam("select") List<String> selectors,
+                      @RequestParam("top") Integer top,
+                      @RequestParam("filter") String filter){
+        return executor.count(ODataInterpreter.getFilter(selectors, top, filter));
     }
 }
